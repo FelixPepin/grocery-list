@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "37ccc712-1d46-4a61-824b-986af6ad81fb",
+    "_postman_id": "b7925c72-dafa-4a20-8dfa-cb0b8ee0a65d",
     "name": "Grocery List API",
-    "description": "Requests and automated tests for the grocery list REST API.\n\nRun the whole collection with **Run collection** (order matters: \"Create item - valid\" saves `itemId`).\n\nRequires the backend on http://localhost:3000 and the MySQL container (`docker compose up -d`).",
+    "description": "Requests and automated tests for the grocery list REST API.\n\nRun the **grocery_list** folder with **Run folder** (order matters: \"Create item - valid\" saves `itemId`, then PUT/DELETE use it). The destructive folder deletes every item and is meant to be run separately.\n\nRequires the backend on http://localhost:3000 and the MySQL container (`docker compose up -d`).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "event": [
@@ -12,21 +12,24 @@
         "type": "text/javascript",
         "exec": [
           "// Runs after EVERY request of the collection",
-          "pm.test(\"Response is JSON\", () => {",
-          "  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-          "});",
-          "",
-          "pm.test(\"Response has the standard envelope\", () => {",
-          "  const body = pm.response.json();",
-          "  pm.expect(body).to.have.property(\"status\", pm.response.code);",
-          "  pm.expect(body).to.have.property(\"message\");",
-          "  pm.expect(body.path).to.be.a(\"string\");",
-          "  pm.expect(new Date(body.timestamp).toString()).to.not.eql(\"Invalid Date\");",
-          "});",
-          "",
           "pm.test(\"Response time is under 1s\", () => {",
           "  pm.expect(pm.response.responseTime).to.be.below(1000);",
-          "});"
+          "});",
+          "",
+          "// 204 No Content has no body: nothing else to check",
+          "if (pm.response.code !== 204) {",
+          "  pm.test(\"Response is JSON\", () => {",
+          "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+          "  });",
+          "",
+          "  pm.test(\"Response has the standard envelope\", () => {",
+          "    const body = pm.response.json();",
+          "    pm.expect(body).to.have.property(\"status\", pm.response.code);",
+          "    pm.expect(body).to.have.property(\"message\");",
+          "    pm.expect(body.path).to.be.a(\"string\");",
+          "    pm.expect(new Date(body.timestamp).toString()).to.not.eql(\"Invalid Date\");",
+          "  });",
+          "}"
         ]
       }
     }
@@ -985,6 +988,576 @@
           }
         },
         {
+          "name": "Update item - valid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test(\"Returns the updated item with a trimmed name\", () => {",
+                  "  const item = pm.response.json().data;",
+                  "  pm.expect(item.id).to.eql(Number(pm.collectionVariables.get(\"itemId\")));",
+                  "  pm.expect(item.name).to.eql(\"Green banana\");",
+                  "  pm.expect(item.quantity).to.eql(5);",
+                  "  pm.expect(item.unit_price).to.eql(0.4);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/{{itemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "{{itemId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"  Green banana  \",\n  \"quantity\": 5,\n  \"unit_price\": 0.4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get all items - update is saved",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test(\"The updated values are saved in the database\", () => {",
+                  "  const itemId = Number(pm.collectionVariables.get(\"itemId\"));",
+                  "  const item = pm.response.json().data.find((i) => i.id === itemId);",
+                  "  pm.expect(item, \"item still exists\").to.exist;",
+                  "  pm.expect(item.name).to.eql(\"Green banana\");",
+                  "  pm.expect(item.quantity).to.eql(5);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update item - price with 3 decimals is rounded",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test(\"Returns the value saved by MySQL (DECIMAL(10,2)), not the one sent\", () => {",
+                  "  pm.expect(pm.response.json().data.unit_price).to.eql(2);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/{{itemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "{{itemId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Green banana\",\n  \"quantity\": 5,\n  \"unit_price\": 1.999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update item - not found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));",
+                  "",
+                  "pm.test(\"Error code is ITEM_NOT_FOUND\", () => {",
+                  "  pm.expect(pm.response.json().code).to.eql(\"ITEM_NOT_FOUND\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error type is \\\"Not Found\\\"\", () => {",
+                  "  pm.expect(pm.response.json().error).to.eql(\"Not Found\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error has a readable message\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"No data is returned with an error\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.have.property(\"data\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Egg\",\n  \"quantity\": 1,\n  \"unit_price\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update item - id is not a number",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "",
+                  "pm.test(\"Error code is ID_INVALID\", () => {",
+                  "  pm.expect(pm.response.json().code).to.eql(\"ID_INVALID\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error type is \\\"Bad Request\\\"\", () => {",
+                  "  pm.expect(pm.response.json().error).to.eql(\"Bad Request\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error has a readable message\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"No data is returned with an error\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.have.property(\"data\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "abc"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Egg\",\n  \"quantity\": 1,\n  \"unit_price\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update item - id is 0",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "",
+                  "pm.test(\"Error code is ID_INVALID\", () => {",
+                  "  pm.expect(pm.response.json().code).to.eql(\"ID_INVALID\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error type is \\\"Bad Request\\\"\", () => {",
+                  "  pm.expect(pm.response.json().error).to.eql(\"Bad Request\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error has a readable message\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"No data is returned with an error\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.have.property(\"data\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "0"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Egg\",\n  \"quantity\": 1,\n  \"unit_price\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update item - invalid body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));",
+                  "",
+                  "pm.test(\"Error code is QUANTITY_TOO_LOW\", () => {",
+                  "  pm.expect(pm.response.json().code).to.eql(\"QUANTITY_TOO_LOW\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error type is \\\"Unprocessable Entity\\\"\", () => {",
+                  "  pm.expect(pm.response.json().error).to.eql(\"Unprocessable Entity\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error has a readable message\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"No data is returned with an error\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.have.property(\"data\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/{{itemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "{{itemId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Egg\",\n  \"quantity\": 0,\n  \"unit_price\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update item - invalid id is checked before the body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "",
+                  "pm.test(\"Error code is ID_INVALID\", () => {",
+                  "  pm.expect(pm.response.json().code).to.eql(\"ID_INVALID\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error type is \\\"Bad Request\\\"\", () => {",
+                  "  pm.expect(pm.response.json().error).to.eql(\"Bad Request\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error has a readable message\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"No data is returned with an error\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.have.property(\"data\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "abc"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete item - valid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 204\", () => pm.response.to.have.status(204));",
+                  "",
+                  "pm.test(\"Response has no body\", () => {",
+                  "  pm.expect(pm.response.text()).to.eql(\"\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/{{itemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "{{itemId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete item - already deleted",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": []
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/{{itemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "{{itemId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  \"pm.test(\\\"Status is 404\\\", () => pm.response.to.have.status(404));\",\n  \"\",\n  \"pm.test(\\\"Error code is ITEM_NOT_FOUND\\\", () => {\",\n  \"  pm.expect(pm.response.json().code).to.eql(\\\"ITEM_NOT_FOUND\\\");\",\n  \"});\",\n  \"\",\n  \"pm.test(\\\"Error type is \\\\\\\"Not Found\\\\\\\"\\\", () => {\",\n  \"  pm.expect(pm.response.json().error).to.eql(\\\"Not Found\\\");\",\n  \"});\",\n  \"\",\n  \"pm.test(\\\"Error has a readable message\\\", () => {\",\n  \"  pm.expect(pm.response.json().message).to.be.a(\\\"string\\\").and.not.empty;\",\n  \"});\",\n  \"\",\n  \"pm.test(\\\"No data is returned with an error\\\", () => {\",\n  \"  pm.expect(pm.response.json()).to.not.have.property(\\\"data\\\");\",\n  \"});\"\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get all items - item is gone",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "",
+                  "pm.test(\"The deleted item is no longer in the list\", () => {",
+                  "  const itemId = Number(pm.collectionVariables.get(\"itemId\"));",
+                  "  const ids = pm.response.json().data.map((i) => i.id);",
+                  "  pm.expect(ids).to.not.include(itemId);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete item - id is not a number",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "",
+                  "pm.test(\"Error code is ID_INVALID\", () => {",
+                  "  pm.expect(pm.response.json().code).to.eql(\"ID_INVALID\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error type is \\\"Bad Request\\\"\", () => {",
+                  "  pm.expect(pm.response.json().error).to.eql(\"Bad Request\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error has a readable message\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"No data is returned with an error\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.have.property(\"data\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list",
+                "abc"
+              ]
+            }
+          }
+        },
+        {
           "name": "Unknown route",
           "event": [
             {
@@ -1023,6 +1596,67 @@
               ],
               "path": [
                 "unknown"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚠️ Destructive - run separately",
+      "description": "Deletes EVERY item (including the sample data). Not part of the normal run: right-click this folder > Run folder. To get the sample data back: docker compose down -v && docker compose up -d",
+      "item": [
+        {
+          "name": "Delete all items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get all items - list is empty",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"The list is empty\", () => pm.expect(pm.response.json().data).to.eql([]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list"
               ]
             }
           }
