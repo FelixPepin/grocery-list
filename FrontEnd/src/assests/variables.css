@@ -1,0 +1,44 @@
+/* Design tokens shared by every component (scoped styles use var(--...)) */
+:root {
+  /* Colors */
+  --color-primary: #2f7d4f;
+  --color-primary-hover: #24613d;
+  --color-text: #1f2a24;
+  --color-text-muted: #5f6b64;
+  --color-border: #dfe6e1;
+  --color-background: #f6f8f5;
+  --color-surface: #ffffff;
+  --color-error: #b3261e;
+  --color-error-background: #fdecea;
+  --color-success: #1e7a46;
+  --color-success-background: #e7f5ec;
+
+  /* Typography */
+  --font-body: 'DM Sans', sans-serif;
+  --font-title: 'Fjalla One', sans-serif;
+
+  /* Shapes */
+  --radius: 10px;
+  --shadow: 0 2px 8px rgb(0 0 0 / 6%);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+}
+
+/* Base styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-background);
+}
