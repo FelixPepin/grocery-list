@@ -1,6 +1,8 @@
 import { httpError } from "../utils/httpError.mjs";
 
 const NAME_MAX_LENGTH = 50;
+const QUANTITY_MAX = 10000;
+const UNIT_PRICE_MAX = 100000;
 
 /**
  * Validates the body of POST and PUT /grocery_list requests.
@@ -46,6 +48,15 @@ export function validateGroceryItem(req, res, next) {
       httpError("Quantity must be at least 1", "QUANTITY_TOO_LOW", 422),
     );
   }
+  if (quantity > QUANTITY_MAX) {
+    return next(
+      httpError(
+        `Quantity cannot exceed ${QUANTITY_MAX}`,
+        "QUANTITY_TOO_HIGH",
+        422,
+      ),
+    );
+  }
 
   // Unit price validation
   if (unit_price === undefined || unit_price === null) {
@@ -61,6 +72,15 @@ export function validateGroceryItem(req, res, next) {
   if (unit_price <= 0) {
     return next(
       httpError("Unit price must be greater than 0", "UNIT_PRICE_TOO_LOW", 422),
+    );
+  }
+  if (unit_price > UNIT_PRICE_MAX) {
+    return next(
+      httpError(
+        `Unit price cannot exceed ${UNIT_PRICE_MAX}`,
+        "UNIT_PRICE_TOO_HIGH",
+        422,
+      ),
     );
   }
 
