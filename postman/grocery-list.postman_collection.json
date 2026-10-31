@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "b7925c72-dafa-4a20-8dfa-cb0b8ee0a65d",
+    "_postman_id": "408174e7-236c-4268-b571-e383716fcd52",
     "name": "Grocery List API",
     "description": "Requests and automated tests for the grocery list REST API.\n\nRun the **grocery_list** folder with **Run folder** (order matters: \"Create item - valid\" saves `itemId`, then PUT/DELETE use it). The destructive folder deletes every item and is meant to be run separately.\n\nRequires the backend on http://localhost:3000 and the MySQL container (`docker compose up -d`).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -703,6 +703,120 @@
           }
         },
         {
+          "name": "Create item - quantity too high",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));",
+                  "",
+                  "pm.test(\"Error code is QUANTITY_TOO_HIGH\", () => {",
+                  "  pm.expect(pm.response.json().code).to.eql(\"QUANTITY_TOO_HIGH\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error type is \\\"Unprocessable Entity\\\"\", () => {",
+                  "  pm.expect(pm.response.json().error).to.eql(\"Unprocessable Entity\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error has a readable message\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"No data is returned with an error\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.have.property(\"data\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Egg\",\n  \"quantity\": 10001,\n  \"unit_price\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create item - huge quantity (would overflow MySQL INT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));",
+                  "",
+                  "pm.test(\"Error code is QUANTITY_TOO_HIGH\", () => {",
+                  "  pm.expect(pm.response.json().code).to.eql(\"QUANTITY_TOO_HIGH\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error type is \\\"Unprocessable Entity\\\"\", () => {",
+                  "  pm.expect(pm.response.json().error).to.eql(\"Unprocessable Entity\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error has a readable message\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"No data is returned with an error\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.have.property(\"data\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Egg\",\n  \"quantity\": 1231823712893712000000,\n  \"unit_price\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
           "name": "Create item - missing unit price",
           "event": [
             {
@@ -922,6 +1036,63 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Egg\",\n  \"quantity\": 2,\n  \"unit_price\": -1.5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Create item - price too high",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 422\", () => pm.response.to.have.status(422));",
+                  "",
+                  "pm.test(\"Error code is UNIT_PRICE_TOO_HIGH\", () => {",
+                  "  pm.expect(pm.response.json().code).to.eql(\"UNIT_PRICE_TOO_HIGH\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error type is \\\"Unprocessable Entity\\\"\", () => {",
+                  "  pm.expect(pm.response.json().error).to.eql(\"Unprocessable Entity\");",
+                  "});",
+                  "",
+                  "pm.test(\"Error has a readable message\", () => {",
+                  "  pm.expect(pm.response.json().message).to.be.a(\"string\").and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"No data is returned with an error\", () => {",
+                  "  pm.expect(pm.response.json()).to.not.have.property(\"data\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/grocery_list",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "grocery_list"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Egg\",\n  \"quantity\": 1,\n  \"unit_price\": 100001\n}",
               "options": {
                 "raw": {
                   "language": "json"

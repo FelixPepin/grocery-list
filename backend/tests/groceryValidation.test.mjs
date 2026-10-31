@@ -51,6 +51,8 @@ describe("validateGroceryItem", () => {
     ["unit_price is NaN", { unit_price: NaN }, 422, "UNIT_PRICE_INVALID"],
     ["unit_price is 0", { unit_price: 0 }, 422, "UNIT_PRICE_TOO_LOW"],
     ["unit_price is negative", { unit_price: -2 }, 422, "UNIT_PRICE_TOO_LOW"],
+    ["quantity is too high", { quantity: 10001 }, 422, "QUANTITY_TOO_HIGH"],
+    ["unit_price is too high", { unit_price: 100001 }, 422, "UNIT_PRICE_TOO_HIGH"],
   ])("rejects the item when %s (%i %s)", (_label, override, status, code) => {
     // Arrange
     const req = { body: { ...validItem, ...override } };

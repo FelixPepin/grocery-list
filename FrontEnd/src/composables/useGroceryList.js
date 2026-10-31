@@ -34,6 +34,30 @@ export function useGroceryList() {
       isLoading.value = false
     }
   }
+  /**
+   * Creates an item (POST /grocery_list) and adds it at the top of the list.
+   * Returns { success: true, item } or { success: false, code } so the form can react.
+   */
+  async function createItem(item) {
+    try {
+      const response = await fetch(`${API_URL}/grocery_list`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item),
+      })
+      const body = await response.json()
 
-  return { items, isLoading, errorCode, fetchItems }
+      if (!response.ok) {
+        return { success: false, code: body.code || 'INTERNAL_ERROR' }
+      }
+
+      // The list is sorted newest first, like the API (ORDER BY id DESC)
+      items.value.unshift(body.data)
+      return { success: true, item: body.data }
+    } catch {
+      return { success: false, code: 'NETWORK_ERROR' }
+    }
+  }
+
+  return { items, isLoading, errorCode, fetchItems, createItem }
 }
