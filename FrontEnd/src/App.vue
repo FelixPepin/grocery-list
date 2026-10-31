@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
+import GroceryForm from './components/GroceryForm.vue'
 import { useI18n } from './i18n/useI18n'
 import { useGroceryList } from './composables/useGroceryList'
 import GroceryList from './components/GroceryList.vue'
@@ -14,8 +15,7 @@ onMounted(fetchItems)
 <template>
   <main class="app">
     <h1>{{ t('app.title') }}</h1>
-
-    <!-- Order matters: loading first, then error, so a server error never shows "empty list" -->
+    <GroceryForm />
     <p v-if="isLoading" class="status">{{ t('list.loading') }}</p>
     <AlertMessage v-else-if="errorCode" :message="t(`errors.${errorCode}`)" />
     <p v-else-if="items.length === 0" class="status">{{ t('list.empty') }}</p>
