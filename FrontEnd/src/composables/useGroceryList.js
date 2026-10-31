@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -7,6 +7,18 @@ const items = ref([])
 const isLoading = ref(false)
 // Stores the error CODE (not a message) so the component can translate it
 const errorCode = ref('')
+
+// Recalculated automatically every time an item is added, updated or removed
+const total = computed(() =>
+  items.value.reduce((sum, item) => sum + item.quantity * item.unit_price, 0),
+)
+
+/**
+ * Removes an item from the shared items.
+ */
+function removeFromItems(id) {
+  items.value = items.value.filter((item) => item.id !== id)
+}
 
 export function useGroceryList() {
   /**
@@ -58,6 +70,80 @@ export function useGroceryList() {
       return { success: false, code: 'NETWORK_ERROR' }
     }
   }
+  /**
+   * Updates an item (PUT /grocery_list/:id) and replaces it in the list.
+   * Returns { success: true, item } or { success: false, code }.
+   */
+  async function updateItem(id, item) {
+    try {
+      const response = await fetch(`${API_URL}/grocery_list/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item),
+      })
+      const body = await response.json()
 
-  return { items, isLoading, errorCode, fetchItems, createItem }
+      if (!response.ok) {
+        return { success: false, code: body.code || 'INTERNAL_ERROR' }
+      }
+
+      // Replaces the old version with the one saved by the API
+      items.value = items.value.map((existing) => (existing.id === id ? body.data : existing))
+      return { success: true, item: body.data }
+    } catch {
+      return { success: false, code: 'NETWORK_ERROR' }
+    }
+  }
+  /**
+   * Deletes an item (DELETE /grocery_list/:id) and removes it from the list.
+   * Returns { success: true } or { success: false, code }.
+   */
+  async function deleteItem(id) {
+    try {
+      const response = await fetch(`${API_URL}/grocery_list/${id}`, { method: 'DELETE' })
+
+      // 204 No Content: there is no body to read
+      if (!response.ok) {
+        const body = await response.json()
+        return { success: false, code: body.code || 'INTERNAL_ERROR' }
+      }
+
+      removeFromItems(id)
+      return { success: true }
+    } catch {
+      return { success: false, code: 'NETWORK_ERROR' }
+    }
+  }
+
+  /**
+   * Deletes every item (DELETE /grocery_list).
+   * Returns { success: true } or { success: false, code }.
+   */
+  async function deleteAllItems() {
+    try {
+      const response = await fetch(`${API_URL}/grocery_list`, { method: 'DELETE' })
+
+      if (!response.ok) {
+        const body = await response.json()
+        return { success: false, code: body.code || 'INTERNAL_ERROR' }
+      }
+
+      items.value = []
+      return { success: true }
+    } catch {
+      return { success: false, code: 'NETWORK_ERROR' }
+    }
+  }
+
+  return {
+    items,
+    isLoading,
+    errorCode,
+    fetchItems,
+    createItem,
+    updateItem,
+    deleteItem,
+    deleteAllItems,
+    total,
+  }
 }

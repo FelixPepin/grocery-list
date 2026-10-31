@@ -1,18 +1,37 @@
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from '../i18n/useI18n'
 import { useGroceryList } from '../composables/useGroceryList'
 import { validateItem, NAME_MAX_LENGTH, QUANTITY_MAX, UNIT_PRICE_MAX } from '../utils/validateItem'
 import AlertMessage from './AlertMessage.vue'
 
+const props = defineProps({
+  // When an item is given, the form edits it instead of creating a new one
+  item: {
+    type: Object,
+    default: null,
+  },
+})
+
+const emit = defineEmits(['done'])
+
 const { t } = useI18n()
-const { createItem } = useGroceryList()
+const { createItem, updateItem } = useGroceryList()
+
+const isEditing = computed(() => props.item !== null)
+
+// The add form and the edit forms can be on the page at the same time: ids must be unique
+const idPrefix = props.item ? `edit-${props.item.id}-` : ''
+const fieldId = (field) => `${idPrefix}item-${field}`
 
 const FIELDS = ['name', 'quantity', 'unit_price']
 
-const emptyForm = () => ({ name: '', quantity: 1, unit_price: '' })
+const initialForm = () =>
+  isEditing.value
+    ? { name: props.item.name, quantity: props.item.quantity, unit_price: props.item.unit_price }
+    : { name: '', quantity: 1, unit_price: '' }
 
-const form = reactive(emptyForm())
+const form = reactive(initialForm())
 const touched = reactive({ name: false, quantity: false, unit_price: false })
 const submitted = ref(false)
 const isSubmitting = ref(false)
@@ -37,7 +56,7 @@ function fieldError(field) {
 }
 
 function resetForm() {
-  Object.assign(form, emptyForm())
+  Object.assign(form, initialForm())
   FIELDS.forEach((field) => (touched[field] = false))
   submitted.value = false
 }
@@ -58,14 +77,23 @@ async function submit() {
   isSubmitting.value = true
 
   try {
-    const result = await createItem({
+    const payload = {
       name: form.name.trim(),
       quantity: form.quantity,
       unit_price: form.unit_price,
-    })
+    }
+    const result = isEditing.value
+      ? await updateItem(props.item.id, payload)
+      : await createItem(payload)
 
     if (!result.success) {
       serverErrorCode.value = result.code
+      return
+    }
+
+    // The list already shows the saved version: the card just closes the edit form
+    if (isEditing.value) {
+      emit('done')
       return
     }
 
@@ -77,41 +105,47 @@ async function submit() {
     isSubmitting.value = false
   }
 }
+
+// Lets the user start typing right away when the edit form opens
+onMounted(() => {
+  if (isEditing.value) nameInput.value.focus()
+})
 </script>
 
 <template>
   <form
     class="grocery-form"
+    :class="{ embedded: isEditing }"
     novalidate
     :aria-busy="isSubmitting"
     @submit.prevent="submit"
     @input="successName = ''"
   >
-    <h2>{{ t('form.title') }}</h2>
+    <h2>{{ isEditing ? t('form.editTitle') : t('form.title') }}</h2>
 
     <div class="fields">
       <div class="field">
-        <label for="item-name">{{ t('form.name') }}</label>
+        <label :for="fieldId('name')">{{ t('form.name') }}</label>
         <input
-          id="item-name"
+          :id="fieldId('name')"
           ref="nameInput"
           v-model="form.name"
           type="text"
           autocomplete="off"
           :class="{ invalid: fieldError('name') }"
           :aria-invalid="fieldError('name') ? 'true' : undefined"
-          :aria-describedby="fieldError('name') ? 'item-name-error' : undefined"
+          :aria-describedby="fieldError('name') ? fieldId('name-error') : undefined"
           @blur="touched.name = true"
         />
-        <small v-if="fieldError('name')" id="item-name-error" class="field-error">
+        <small v-if="fieldError('name')" :id="fieldId('name-error')" class="field-error">
           {{ fieldError('name') }}
         </small>
       </div>
 
       <div class="field">
-        <label for="item-quantity">{{ t('form.quantity') }}</label>
+        <label :for="fieldId('quantity')">{{ t('form.quantity') }}</label>
         <input
-          id="item-quantity"
+          :id="fieldId('quantity')"
           ref="quantityInput"
           v-model.number="form.quantity"
           type="number"
@@ -120,18 +154,18 @@ async function submit() {
           inputmode="numeric"
           :class="{ invalid: fieldError('quantity') }"
           :aria-invalid="fieldError('quantity') ? 'true' : undefined"
-          :aria-describedby="fieldError('quantity') ? 'item-quantity-error' : undefined"
+          :aria-describedby="fieldError('quantity') ? fieldId('quantity-error') : undefined"
           @blur="touched.quantity = true"
         />
-        <small v-if="fieldError('quantity')" id="item-quantity-error" class="field-error">
+        <small v-if="fieldError('quantity')" :id="fieldId('quantity-error')" class="field-error">
           {{ fieldError('quantity') }}
         </small>
       </div>
 
       <div class="field">
-        <label for="item-unit-price">{{ t('form.unitPrice') }}</label>
+        <label :for="fieldId('unit-price')">{{ t('form.unitPrice') }}</label>
         <input
-          id="item-unit-price"
+          :id="fieldId('unit-price')"
           ref="unitPriceInput"
           v-model.number="form.unit_price"
           type="number"
@@ -140,10 +174,14 @@ async function submit() {
           inputmode="decimal"
           :class="{ invalid: fieldError('unit_price') }"
           :aria-invalid="fieldError('unit_price') ? 'true' : undefined"
-          :aria-describedby="fieldError('unit_price') ? 'item-unit-price-error' : undefined"
+          :aria-describedby="fieldError('unit_price') ? fieldId('unit-price-error') : undefined"
           @blur="touched.unit_price = true"
         />
-        <small v-if="fieldError('unit_price')" id="item-unit-price-error" class="field-error">
+        <small
+          v-if="fieldError('unit_price')"
+          :id="fieldId('unit-price-error')"
+          class="field-error"
+        >
           {{ fieldError('unit_price') }}
         </small>
       </div>
@@ -156,9 +194,15 @@ async function submit() {
       :message="t('form.success', { name: successName })"
     />
 
-    <button type="submit" :disabled="isSubmitting">
-      {{ isSubmitting ? t('form.submitting') : t('form.submit') }}
-    </button>
+    <div class="buttons">
+      <button type="submit" :disabled="isSubmitting">
+        <template v-if="isEditing">{{ isSubmitting ? t('form.saving') : t('form.save') }}</template>
+        <template v-else>{{ isSubmitting ? t('form.submitting') : t('form.submit') }}</template>
+      </button>
+      <button v-if="isEditing" type="button" class="secondary" @click="emit('done')">
+        {{ t('form.cancel') }}
+      </button>
+    </div>
   </form>
 </template>
 
@@ -175,6 +219,13 @@ async function submit() {
   box-shadow: var(--shadow);
 }
 
+.grocery-form.embedded {
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
 h2 {
   margin: 0;
   font-size: 1.1rem;
@@ -184,13 +235,6 @@ h2 {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: var(--space-md);
-}
-
-/* One field per line on small screens */
-@media (max-width: 600px) {
-  .fields {
-    grid-template-columns: 1fr;
-  }
 }
 
 .field {
@@ -226,8 +270,12 @@ input.invalid {
   font-size: 0.85rem;
 }
 
+.buttons {
+  display: flex;
+  gap: var(--space-sm);
+}
+
 button {
-  align-self: flex-start;
   padding: var(--space-sm) var(--space-lg);
   font: inherit;
   font-weight: 600;
@@ -242,8 +290,25 @@ button:hover:not(:disabled) {
   background: var(--color-primary-hover);
 }
 
+button.secondary {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+button.secondary:hover:not(:disabled) {
+  background: var(--color-background);
+}
+
 button:disabled {
   opacity: 0.6;
   cursor: wait;
+}
+
+/* One field per line on small screens */
+@media (max-width: 600px) {
+  .fields {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
