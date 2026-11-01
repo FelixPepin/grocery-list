@@ -26,11 +26,12 @@ describe('useI18n', () => {
     expect(t('errors.UNKNOWN_CODE')).toBe('errors.UNKNOWN_CODE')
   })
 
-  it('remembers the chosen language and updates <html lang>', () => {
+  it('remembers the chosen language and updates <html lang> and the page title', () => {
     setLocale('fr')
 
     expect(localStorage.getItem('grocery-list-locale')).toBe('fr')
     expect(document.documentElement.lang).toBe('fr')
+    expect(document.title).toBe("Liste d'épicerie")
   })
 
   it('formats prices in Canadian dollars for each language', () => {

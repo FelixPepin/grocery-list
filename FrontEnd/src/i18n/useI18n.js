@@ -5,7 +5,12 @@ const STORAGE_KEY = 'grocery-list-locale'
 
 // Outside the function so all components share the same language
 const locale = ref(getInitialLocale())
-document.documentElement.lang = locale.value
+updateDocument(locale.value)
+
+function updateDocument(lang) {
+  document.documentElement.lang = lang
+  document.title = messages[lang].app.title
+}
 
 /** Saved choice first, then the browser language, then English. */
 function getInitialLocale() {
@@ -28,7 +33,7 @@ export function useI18n() {
 
   function setLocale(newLocale) {
     locale.value = newLocale
-    document.documentElement.lang = newLocale
+    updateDocument(newLocale)
     try {
       localStorage.setItem(STORAGE_KEY, newLocale)
     } catch {
