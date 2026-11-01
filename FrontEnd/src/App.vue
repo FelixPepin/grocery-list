@@ -1,16 +1,8 @@
 <script setup>
-import { onMounted } from 'vue'
-import GroceryForm from './components/GroceryForm.vue'
 import { useI18n } from './i18n/useI18n'
-import { useGroceryList } from './composables/useGroceryList'
-import GroceryList from './components/GroceryList.vue'
-import AlertMessage from './components/AlertMessage.vue'
 import LanguageToggle from './components/LanguageToggle.vue'
 
 const { t } = useI18n()
-const { items, isLoading, errorCode, fetchItems } = useGroceryList()
-
-onMounted(fetchItems)
 </script>
 
 <template>
@@ -19,11 +11,12 @@ onMounted(fetchItems)
       <h1>{{ t('app.title') }}</h1>
       <LanguageToggle />
     </header>
-    <GroceryForm />
-    <p v-if="isLoading" class="status">{{ t('list.loading') }}</p>
-    <AlertMessage v-else-if="errorCode" :message="t(`errors.${errorCode}`)" />
-    <p v-else-if="items.length === 0" class="status">{{ t('list.empty') }}</p>
-    <GroceryList v-else :items="items" />
+    <nav :aria-label="t('nav.label')">
+      <RouterLink to="/">{{ t('nav.list') }}</RouterLink>
+      <RouterLink to="/dev-log">{{ t('nav.devLog') }}</RouterLink>
+    </nav>
+
+    <RouterView />
   </main>
 </template>
 
@@ -42,15 +35,35 @@ h1 {
   color: var(--color-primary);
 }
 
-.status {
-  color: var(--color-text-muted);
-}
-
 header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
+}
+
+nav {
+  display: flex;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+nav a {
+  padding: var(--space-sm) 0;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+}
+
+nav a:hover {
+  color: var(--color-text);
+}
+
+nav a.router-link-active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
 }
 </style>
