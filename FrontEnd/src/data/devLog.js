@@ -114,4 +114,12 @@ export const devLog = [
     },
     minutes: 47,
   },
+  {
+    step: { en: 'Final review', fr: 'Revue finale' },
+    details: {
+      en: 'Code review, simplified comments, renames, cleanup',
+      fr: 'Revue du code, commentaires simplifiés, renommages, ménage',
+    },
+    minutes: 79,
+  },
 ]
