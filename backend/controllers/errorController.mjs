@@ -11,7 +11,7 @@ const errorTypes = {
 /**
  * Middleware that captures undefined routes.
  */
-export const get404 = (req, res) => {
+export const notFoundHandler =(req, res) => {
   res.status(404).json({
     status: 404,
     error: errorTypes[404],
@@ -28,7 +28,7 @@ export const get404 = (req, res) => {
  * Express 5 forwards errors thrown in async handlers to this middleware automatically,
  * so controllers don't need try/catch blocks that only call next(err).
  */
-export const getErrors = (err, req, res, next) => {
+export const errorHandler =(err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || "An error occurred";
   let code = err.code;

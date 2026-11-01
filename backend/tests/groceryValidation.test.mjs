@@ -54,13 +54,10 @@ describe("validateGroceryItem", () => {
     ["quantity is too high", { quantity: 10001 }, 422, "QUANTITY_TOO_HIGH"],
     ["unit_price is too high", { unit_price: 100001 }, 422, "UNIT_PRICE_TOO_HIGH"],
   ])("rejects the item when %s (%i %s)", (_label, override, status, code) => {
-    // Arrange
     const req = { body: { ...validItem, ...override } };
 
-    // Act
     const error = runMiddleware(validateGroceryItem, req);
 
-    // Assert
     expect(error).toBeInstanceOf(Error);
     expect(error.statusCode).toBe(status);
     expect(error.code).toBe(code);

@@ -1,7 +1,7 @@
 import express from "express";
 import pool from "./db.mjs";
 import groceryRoutes from "./routes/groceryRoutes.mjs";
-import { get404, getErrors } from "./controllers/errorController.mjs";
+import { notFoundHandler, errorHandler } from "./controllers/errorController.mjs";
 
 const app = express();
 
@@ -29,8 +29,8 @@ app.use((req, res, next) => {
 app.use("/grocery_list", groceryRoutes);
 
 // Must stay last: unknown routes, then global error handler
-app.use(get404);
-app.use(getErrors);
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 

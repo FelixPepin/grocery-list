@@ -32,12 +32,13 @@ export function useGroceryList() {
 
       items.value = body.data
     } catch {
-      // fetch throws when the server can't be reached at all (backend stopped, wrong URL...)
+      // fetch or response.json() threw: server unreachable, or the answer is not JSON
       errorCode.value = 'NETWORK_ERROR'
     } finally {
       isLoading.value = false
     }
   }
+
   /**
    * Creates an item (POST /grocery_list) and adds it at the top of the list.
    * Returns { success: true, item } or { success: false, code } so the form can react.
@@ -62,6 +63,7 @@ export function useGroceryList() {
       return { success: false, code: 'NETWORK_ERROR' }
     }
   }
+
   /**
    * Updates an item (PUT /grocery_list/:id) and replaces it in the list.
    * Returns { success: true, item } or { success: false, code }.
@@ -86,6 +88,7 @@ export function useGroceryList() {
       return { success: false, code: 'NETWORK_ERROR' }
     }
   }
+
   /**
    * Deletes an item (DELETE /grocery_list/:id) and removes it from the list.
    * Returns { success: true } or { success: false, code }.

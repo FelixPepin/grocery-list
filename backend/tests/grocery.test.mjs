@@ -158,7 +158,7 @@ describe("Error handling", () => {
   });
 
   it("returns 500 without leaking internal details when the database fails", async () => {
-    // Hides the console.error of getErrors to keep the test output clean
+    // Hides the console.error of errorHandler to keep the test output clean
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     getAllItems.mockRejectedValue(new Error("connect ECONNREFUSED 127.0.0.1:3307"));
 
