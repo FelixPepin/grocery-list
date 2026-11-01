@@ -20,7 +20,7 @@ const { createItem, updateItem } = useGroceryList()
 
 const isEditing = computed(() => props.item !== null)
 
-// The add form and the edit forms can be on the page at the same time: ids must be unique
+// Add and edit forms can be on the page together, so ids need a prefix
 const idPrefix = props.item ? `edit-${props.item.id}-` : ''
 const fieldId = (field) => `${idPrefix}item-${field}`
 
@@ -35,7 +35,7 @@ const form = reactive(initialForm())
 const touched = reactive({ name: false, quantity: false, unit_price: false })
 const submitted = ref(false)
 const isSubmitting = ref(false)
-// Codes and names are stored instead of texts, so the messages follow the language switch
+// Store codes, not texts, so messages follow the language switch
 const serverErrorCode = ref('')
 const successName = ref('')
 
@@ -95,7 +95,6 @@ async function submit() {
       return
     }
 
-    // The list already shows the saved version: the card just closes the edit form
     if (isEditing.value) {
       emit('done')
       return
@@ -110,7 +109,6 @@ async function submit() {
   }
 }
 
-// Lets the user start typing right away when the edit form opens
 onMounted(() => {
   if (isEditing.value) nameInput.value.focus()
 })

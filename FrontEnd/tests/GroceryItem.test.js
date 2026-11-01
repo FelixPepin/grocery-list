@@ -80,7 +80,6 @@ describe('GroceryItem - edit and delete', () => {
     const wrapper = mount(GroceryItem, { props: { item: apple } })
 
     await wrapper.find('button[aria-label="Edit Apple"]').trigger('click')
-    // The edit form uses unique ids (edit-<id>-...) so it never clashes with the add form
     expect(wrapper.find('#edit-1-item-name').element.value).toBe('Apple')
 
     await wrapper.find('#edit-1-item-quantity').setValue('5')
@@ -92,7 +91,6 @@ describe('GroceryItem - edit and delete', () => {
       quantity: 5,
       unit_price: 1.5,
     })
-    // The form closes once the item is saved
     expect(wrapper.find('form').exists()).toBe(false)
   })
 

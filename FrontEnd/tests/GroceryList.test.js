@@ -32,7 +32,7 @@ describe('GroceryList', () => {
     const wrapper = mount(GroceryList, { props: { items } })
 
     await wrapper.find('.summary button.danger').trigger('click')
-    // The last dialog is the one of the list (each card has its own for its delete)
+    // Each card has its own dialog, the list's one is the last
     const dialogs = wrapper.findAll('dialog')
     await dialogs[dialogs.length - 1].find('button.danger').trigger('click')
     await flushPromises()

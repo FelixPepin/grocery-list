@@ -1,8 +1,8 @@
 import request from "supertest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// The model is mocked: these tests never touch the database, so they also run in CI.
-// vi.mock is created before the imports, so app.mjs receives this fake model.
+// Mocked model: no database needed, so the tests run in CI
+// vi.mock is hoisted above the imports, so app.mjs gets the fake
 vi.mock("../models/groceryModel.mjs", () => ({
   getAllItems: vi.fn(),
   getItemById: vi.fn(),
@@ -53,7 +53,6 @@ describe("POST /grocery_list", () => {
     expect(response.status).toBe(201);
     expect(response.headers.location).toBe("/grocery_list/1");
     expect(response.body.data).toEqual(apple);
-    // The validation middleware trimmed the name before the controller saved it
     expect(createItem).toHaveBeenCalledWith({ name: "Apple", quantity: 3, unit_price: 1.5 });
   });
 
@@ -72,7 +71,6 @@ describe("PUT /grocery_list/:id", () => {
   const changes = { name: "Green apple", quantity: 5, unit_price: 2 };
 
   it("updates the item and returns the saved version", async () => {
-    // The controller calls getItemById twice: one answer per call, in order
     getItemById
       .mockResolvedValueOnce(apple) // existence check
       .mockResolvedValueOnce({ id: 1, ...changes }); // read after the update
@@ -147,7 +145,7 @@ describe("Error handling", () => {
   });
 
   it("returns 400 for a malformed JSON body", async () => {
-    // .send() with a string sends it as is, so the JSON stays broken
+    // A string is sent as is, so the JSON stays broken
     const response = await request(app)
       .post("/grocery_list")
       .set("Content-Type", "application/json")
@@ -158,7 +156,7 @@ describe("Error handling", () => {
   });
 
   it("returns 500 without leaking internal details when the database fails", async () => {
-    // Hides the console.error of errorHandler to keep the test output clean
+    // Silence errorHandler's console.error
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     getAllItems.mockRejectedValue(new Error("connect ECONNREFUSED 127.0.0.1:3307"));
 
@@ -166,14 +164,12 @@ describe("Error handling", () => {
 
     expect(response.status).toBe(500);
     expect(response.body.code).toBe("INTERNAL_ERROR");
-    // The database address must never reach the client
     expect(JSON.stringify(response.body)).not.toContain("ECONNREFUSED");
 
     consoleSpy.mockRestore();
   });
 
   it("turns a database CHECK constraint error into a 422", async () => {
-    // Simulates the error MySQL throws when a CHECK constraint is violated
     const dbError = Object.assign(new Error("Check constraint violated"), {
       code: "ER_CHECK_CONSTRAINT_VIOLATED",
     });

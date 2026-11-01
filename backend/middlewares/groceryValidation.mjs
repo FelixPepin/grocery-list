@@ -4,10 +4,7 @@ const NAME_MAX_LENGTH = 50;
 const QUANTITY_MAX = 10000;
 const UNIT_PRICE_MAX = 100000;
 
-/**
- * Validates the body of POST and PUT /grocery_list requests.
- * On success, the name is trimmed before reaching the controller.
- */
+/** Also trims the name before it reaches the controller. */
 export function validateGroceryItem(req, res, next) {
   const { name, quantity, unit_price } = req.body;
 

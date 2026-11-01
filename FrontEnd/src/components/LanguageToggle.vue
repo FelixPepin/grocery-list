@@ -3,7 +3,6 @@ import { useI18n } from '../i18n/useI18n'
 
 const { locale, setLocale, t } = useI18n()
 
-// name is read by screen readers ("FR" alone would be spelled letter by letter)
 const LANGUAGES = [
   { code: 'fr', label: 'FR', name: 'Français' },
   { code: 'en', label: 'EN', name: 'English' },
@@ -41,7 +40,6 @@ button {
   font-weight: 600;
   color: var(--color-text-muted);
   border: none;
-  /* The group's border is already rounded */
   border-radius: 0;
 }
 

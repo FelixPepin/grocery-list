@@ -171,7 +171,6 @@ button.danger:hover:not(:disabled) {
   background: var(--color-error);
 }
 
-/* The edit form and the error take the full width of the card */
 .full-width {
   flex-basis: 100%;
 }

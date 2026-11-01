@@ -1,8 +1,6 @@
 /**
  * Time spent on each step of the project, also shown in the README.
- * Each text is written in both languages so the page follows the FR/EN switch.
- * minutes: null means the step is not finished yet.
- */
+ * Each text is written in both languages so the page follows the FR/EN switch. */
 export const devLog = [
   {
     step: { en: 'Project setup', fr: 'Mise en place du projet' },

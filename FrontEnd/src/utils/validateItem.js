@@ -2,17 +2,9 @@ export const NAME_MAX_LENGTH = 50
 export const QUANTITY_MAX = 10000
 export const UNIT_PRICE_MAX = 100000
 
-/** True when an input is left blank (v-model.number keeps '' for an empty field). */
 const isEmpty = (value) => value === '' || value === null || value === undefined
 
-/**
- * Validates a grocery item with the same rules as the API.
- * Returns one error code per invalid field (the codes match the API's, so they share the
- * same translations), or an empty object when the item is valid.
- *
- * @param {{ name: string, quantity: number|string, unit_price: number|string }} item
- * @returns {{ name?: string, quantity?: string, unit_price?: string }}
- */
+/** Same rules and error codes as the API. Returns { field: code }, or {} when valid. */
 export function validateItem({ name, quantity, unit_price }) {
   const errors = {}
 

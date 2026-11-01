@@ -44,7 +44,6 @@ body {
   background: var(--color-background);
 }
 
-/* Shared button look: components only add their variants (danger, secondary...) */
 button {
   padding: var(--space-sm) var(--space-lg);
   font: inherit;

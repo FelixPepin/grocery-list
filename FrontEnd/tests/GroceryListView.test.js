@@ -27,7 +27,6 @@ describe('GroceryListView', () => {
     )
 
     const wrapper = mount(GroceryListView)
-    // Waits for onMounted → fetchItems() to finish
     await flushPromises()
 
     expect(wrapper.findAll('li')).toHaveLength(1)

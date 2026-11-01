@@ -5,9 +5,7 @@ import App from '../src/App.vue'
 import { routes } from '../src/router'
 import { useI18n } from '../src/i18n/useI18n'
 
-/** Mounts the whole app with a real router, starting on the given URL. */
 async function mountAt(path) {
-  // Memory history: no real browser URL is needed in the tests
   const router = createRouter({ history: createMemoryHistory(), routes })
   router.push(path)
   await router.isReady()
@@ -19,7 +17,7 @@ async function mountAt(path) {
 
 beforeEach(() => {
   useI18n().setLocale('en')
-  // The list page loads the items when it opens
+  // The list page calls fetch on mount
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ data: [] }) }),
@@ -35,7 +33,10 @@ describe('App - navigation', () => {
     const { wrapper } = await mountAt('/')
 
     expect(wrapper.find('form').exists()).toBe(true)
-    // Vue Router adds aria-current="page" to the active link
+
+    // RouterLink sets aria-current="page" on the active link, which screen readers announce
+
+
     expect(wrapper.find('nav a[aria-current="page"]').text()).toBe('Grocery list')
   })
 
@@ -44,7 +45,7 @@ describe('App - navigation', () => {
 
     await wrapper.findAll('nav a')[1].trigger('click')
 
-    // The page is lazy-loaded: wait until its code is downloaded and displayed
+    // Lazy-loaded page: wait for it to render
     await vi.waitFor(() => expect(wrapper.find('table').exists()).toBe(true))
     expect(router.currentRoute.value.path).toBe('/dev-log')
     expect(wrapper.find('nav a[aria-current="page"]').text()).toBe('Development log')

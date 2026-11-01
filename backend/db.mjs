@@ -1,9 +1,6 @@
 import "dotenv/config";
 import mysql from "mysql2/promise";
 
-/**
- * MySQL connection pool shared by all models.
- */
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),

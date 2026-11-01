@@ -13,7 +13,6 @@ defineProps({
 </script>
 
 <template>
-  <!-- role="alert" makes screen readers read the message as soon as it appears -->
   <p class="alert" :class="type" role="alert">{{ message }}</p>
 </template>
 
