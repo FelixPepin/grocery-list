@@ -1,57 +1,58 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import App from '../src/App.vue'
+import { routes } from '../src/router'
 import { useI18n } from '../src/i18n/useI18n'
-import { useGroceryList } from '../src/composables/useGroceryList'
 
-function fakeResponse(status, body) {
-  return { ok: status >= 200 && status < 300, status, json: async () => body }
+/** Mounts the whole app with a real router, starting on the given URL. */
+async function mountAt(path) {
+  // Memory history: no real browser URL is needed in the tests
+  const router = createRouter({ history: createMemoryHistory(), routes })
+  router.push(path)
+  await router.isReady()
+
+  const wrapper = mount(App, { global: { plugins: [router] } })
+  await flushPromises()
+  return { wrapper, router }
 }
 
 beforeEach(() => {
   useI18n().setLocale('en')
-  const { items, errorCode } = useGroceryList()
-  items.value = []
-  errorCode.value = ''
-  vi.stubGlobal('fetch', vi.fn())
+  // The list page loads the items when it opens
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ data: [] }) }),
+  )
 })
 
 afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('App', () => {
-  it('shows the items once they are loaded', async () => {
-    fetch.mockResolvedValue(
-      fakeResponse(200, { data: [{ id: 1, name: 'Apple', quantity: 3, unit_price: 1.5 }] }),
-    )
+describe('App - navigation', () => {
+  it('shows the grocery list on "/" and marks its link as the current page', async () => {
+    const { wrapper } = await mountAt('/')
 
-    const wrapper = mount(App)
-    // Waits for onMounted → fetchItems() to finish
-    await flushPromises()
-
-    expect(wrapper.findAll('li')).toHaveLength(1)
-    expect(wrapper.text()).toContain('Apple')
+    expect(wrapper.find('form').exists()).toBe(true)
+    // Vue Router adds aria-current="page" to the active link
+    expect(wrapper.find('nav a[aria-current="page"]').text()).toBe('Grocery list')
   })
 
-  it('shows a translated error when the server cannot be reached', async () => {
-    fetch.mockRejectedValue(new TypeError('Failed to fetch'))
+  it('opens the development log when its link is clicked', async () => {
+    const { wrapper, router } = await mountAt('/')
 
-    const wrapper = mount(App)
-    await flushPromises()
+    await wrapper.findAll('nav a')[1].trigger('click')
 
-    expect(wrapper.find('[role="alert"]').text()).toBe(
-      'Unable to reach the server. Is the backend running?',
-    )
+    // The page is lazy-loaded: wait until its code is downloaded and displayed
+    await vi.waitFor(() => expect(wrapper.find('table').exists()).toBe(true))
+    expect(router.currentRoute.value.path).toBe('/dev-log')
+    expect(wrapper.find('nav a[aria-current="page"]').text()).toBe('Development log')
   })
 
-  it('shows a message when the list is empty', async () => {
-    fetch.mockResolvedValue(fakeResponse(200, { data: [] }))
+  it('redirects an unknown URL to the grocery list', async () => {
+    const { router } = await mountAt('/does-not-exist')
 
-    const wrapper = mount(App)
-    await flushPromises()
-
-    expect(wrapper.text()).toContain('Your list is empty')
-    expect(wrapper.find('li').exists()).toBe(false)
+    expect(router.currentRoute.value.path).toBe('/')
   })
 })
