@@ -5,6 +5,7 @@ import { useI18n } from './i18n/useI18n'
 import { useGroceryList } from './composables/useGroceryList'
 import GroceryList from './components/GroceryList.vue'
 import AlertMessage from './components/AlertMessage.vue'
+import LanguageToggle from './components/LanguageToggle.vue'
 
 const { t } = useI18n()
 const { items, isLoading, errorCode, fetchItems } = useGroceryList()
@@ -14,7 +15,10 @@ onMounted(fetchItems)
 
 <template>
   <main class="app">
-    <h1>{{ t('app.title') }}</h1>
+    <header>
+      <h1>{{ t('app.title') }}</h1>
+      <LanguageToggle />
+    </header>
     <GroceryForm />
     <p v-if="isLoading" class="status">{{ t('list.loading') }}</p>
     <AlertMessage v-else-if="errorCode" :message="t(`errors.${errorCode}`)" />
@@ -31,7 +35,7 @@ onMounted(fetchItems)
 }
 
 h1 {
-  margin: 0 0 var(--space-lg);
+  margin: 0;
   font-family: var(--font-title);
   font-weight: 400;
   font-size: 2.2rem;
@@ -40,5 +44,13 @@ h1 {
 
 .status {
   color: var(--color-text-muted);
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 </style>
