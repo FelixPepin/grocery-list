@@ -4,10 +4,7 @@ const NAME_MAX_LENGTH = 50;
 const QUANTITY_MAX = 10000;
 const UNIT_PRICE_MAX = 100000;
 
-/**
- * Validates the body of POST and PUT /grocery_list requests.
- * On success, the name is trimmed before reaching the controller.
- */
+/** Also trims the name before it reaches the controller. */
 export function validateGroceryItem(req, res, next) {
   const { name, quantity, unit_price } = req.body;
 
@@ -18,10 +15,11 @@ export function validateGroceryItem(req, res, next) {
   if (typeof name !== "string") {
     return next(httpError("Name must be a string", "NAME_INVALID", 422));
   }
-  if (name.trim() === "") {
+  const trimmedName = name.trim();
+  if (trimmedName === "") {
     return next(httpError("Name cannot be empty", "NAME_EMPTY", 422));
   }
-  if (name.trim().length > NAME_MAX_LENGTH) {
+  if (trimmedName.length > NAME_MAX_LENGTH) {
     return next(
       httpError(
         `Name cannot exceed ${NAME_MAX_LENGTH} characters`,
@@ -81,7 +79,7 @@ export function validateGroceryItem(req, res, next) {
     );
   }
 
-  req.body.name = name.trim();
+  req.body.name = trimmedName;
 
   next();
 }
@@ -94,7 +92,7 @@ export function validateItemId(req, res, next) {
   const id = Number(req.params.id);
 
   if (!Number.isInteger(id) || id < 1) {
-    return next(httpError("Id must be a number over 0", "ID_INVALID", 400));
+    return next(httpError("Id must be a positive integer", "ID_INVALID", 400));
   }
   next();
 }

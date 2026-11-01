@@ -40,7 +40,7 @@ describe('GroceryForm - validation', () => {
   })
 
   it('puts the focus on the first invalid field', async () => {
-    // attachTo is needed: focus only works on elements that are in the document
+    // Focus only works on elements attached to the document
     wrapper = mount(GroceryForm, { attachTo: document.body })
 
     await wrapper.find('form').trigger('submit')
@@ -87,7 +87,6 @@ describe('GroceryForm - submission', () => {
 
     expect(wrapper.text()).toContain('Banana was added to your list.')
     expect(wrapper.find('#item-name').element.value).toBe('')
-    // The new item is at the top of the shared list
     expect(useGroceryList().items.value[0].name).toBe('Banana')
   })
 

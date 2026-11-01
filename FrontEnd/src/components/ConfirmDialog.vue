@@ -27,7 +27,7 @@ const emit = defineEmits(['confirm', 'cancel'])
 const { t } = useI18n()
 const dialog = ref(null)
 
-// showModal() is what makes it a real modal: dark backdrop, focus kept inside, Esc to close
+// showModal() adds the backdrop and keeps the focus inside
 watch(
   () => props.open,
   (isOpen) => (isOpen ? dialog.value.showModal() : dialog.value.close()),
@@ -35,12 +35,12 @@ watch(
 </script>
 
 <template>
-  <!-- .prevent: the parent decides when to close (Esc only asks for it) -->
+  <!-- Esc only asks to close, the parent decides -->
   <dialog ref="dialog" class="confirm-dialog" @cancel.prevent="emit('cancel')">
     <p class="message">{{ message }}</p>
     <p v-if="warning" class="warning">{{ warning }}</p>
     <div class="buttons">
-      <!-- autofocus on "No": pressing Enter by accident never deletes -->
+      <!-- Focus on "No" so Enter never deletes by accident -->
       <button autofocus :disabled="busy" @click="emit('cancel')">
         {{ t('common.no') }}
       </button>

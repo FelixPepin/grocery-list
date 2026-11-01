@@ -1,13 +1,13 @@
 import express from "express";
 import pool from "./db.mjs";
 import groceryRoutes from "./routes/groceryRoutes.mjs";
-import { get404, getErrors } from "./controllers/errorController.mjs";
+import { notFoundHandler, errorHandler } from "./controllers/errorController.mjs";
 
 const app = express();
 
 app.use(express.json());
 
-// CORS: only the frontend is allowed to call the API
+// CORS: only the frontend can call the API
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", process.env.FRONTEND_URL || "http://localhost:5173");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -29,12 +29,12 @@ app.use((req, res, next) => {
 app.use("/grocery_list", groceryRoutes);
 
 // Must stay last: unknown routes, then global error handler
-app.use(get404);
-app.use(getErrors);
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
-// Vitest sets NODE_ENV to "test": supertest uses the exported app without a real server
+// Vitest sets NODE_ENV to "test", so the tests don't start a real server
 if (process.env.NODE_ENV !== "test") {
   try {
     const connection = await pool.getConnection();

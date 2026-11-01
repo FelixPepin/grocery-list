@@ -3,9 +3,14 @@ import { messages } from './messages'
 
 const STORAGE_KEY = 'grocery-list-locale'
 
-// Declared outside useI18n(): every component shares the same language
+// Outside the function so all components share the same language
 const locale = ref(getInitialLocale())
-document.documentElement.lang = locale.value
+updateDocument(locale.value)
+
+function updateDocument(lang) {
+  document.documentElement.lang = lang
+  document.title = messages[lang].app.title
+}
 
 /** Saved choice first, then the browser language, then English. */
 function getInitialLocale() {
@@ -13,16 +18,13 @@ function getInitialLocale() {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved in messages) return saved
   } catch {
-    // localStorage can be blocked (private mode): fall back to the browser language
+    // localStorage can be blocked in private mode
   }
   return navigator.language.startsWith('fr') ? 'fr' : 'en'
 }
 
 export function useI18n() {
-  /**
-   * Returns the text for a key like 'list.empty', in the active language.
-   * Placeholders like {max} are replaced by the matching value in params.
-   */
+  /** Fills {placeholders} from params. Returns the key itself if the text is missing. */
   function t(key, params = {}) {
     const text = key.split('.').reduce((obj, part) => obj?.[part], messages[locale.value])
     if (typeof text !== 'string') return key
@@ -31,7 +33,7 @@ export function useI18n() {
 
   function setLocale(newLocale) {
     locale.value = newLocale
-    document.documentElement.lang = newLocale
+    updateDocument(newLocale)
     try {
       localStorage.setItem(STORAGE_KEY, newLocale)
     } catch {

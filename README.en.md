@@ -228,7 +228,7 @@ The frontend and the API use the same rules and the same error codes, so the mes
 
 ## Time spent
 
-About **16 hours** in total, detailed below.
+About **17 hours** in total, detailed below.
 
 The same breakdown is also available **directly in the app**, on the **Development log** page (link in the header). This page isn't part of the grocery list itself, and that's intentional: I really enjoy working with **Vue Router**, and since the app only needed one page, I didn't want to leave routing out of the project. Adding a second page was a simple way to show it, with a lazy-loaded route, an active link style and tests, while keeping the grocery list itself untouched.
 
@@ -248,7 +248,8 @@ The same breakdown is also available **directly in the app**, on the **Developme
 | Development log page | Vue Router, lazy-loaded route, this table | 1 h 22 |
 | Documentation | README in English and French | 29 min |
 | Final check | Fresh clone, following this README step by step | 47 min |
-| **Total** | | **16 h 02** |
+| Final review | Code review, simplified comments, renames, cleanup | 1 h 19 |
+| **Total** | | **17 h 21** |
 
 ---
 

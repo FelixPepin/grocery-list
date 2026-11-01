@@ -1,6 +1,3 @@
-/**
- * Dictionary of standard HTTP errors
- */
 const errorTypes = {
   400: "Bad Request",
   404: "Not Found",
@@ -11,7 +8,7 @@ const errorTypes = {
 /**
  * Middleware that captures undefined routes.
  */
-export const get404 = (req, res) => {
+export const notFoundHandler = (req, res) => {
   res.status(404).json({
     status: 404,
     error: errorTypes[404],
@@ -22,13 +19,8 @@ export const get404 = (req, res) => {
   });
 };
 
-/**
- * Global error handler: turns any error into a consistent JSON response.
- *
- * Express 5 forwards errors thrown in async handlers to this middleware automatically,
- * so controllers don't need try/catch blocks that only call next(err).
- */
-export const getErrors = (err, req, res, next) => {
+/** Express 5 sends errors thrown in async handlers here, so controllers need no try/catch. */
+export const errorHandler = (err, req, res, next) => {
   let statusCode = err.statusCode || 500;
   let message = err.message || "An error occurred";
   let code = err.code;
@@ -47,7 +39,7 @@ export const getErrors = (err, req, res, next) => {
     code = "CONSTRAINT_VIOLATION";
   }
 
-  // Unexpected error: log the details, but never expose them to the client
+  // Log the details, but never send them to the client
   if (statusCode === 500) {
     console.error(err);
     message = "An internal error occurred";

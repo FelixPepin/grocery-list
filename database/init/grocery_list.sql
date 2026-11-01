@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS grocery_items (
 
     PRIMARY KEY (id),
 
-    -- Same rules as the API validation
+    -- Minimum rules of the API validation, as a last safety net (maximums are checked by the API)
     CONSTRAINT chk_name_not_empty   CHECK (CHAR_LENGTH(TRIM(name)) > 0),
     CONSTRAINT chk_quantity_min     CHECK (quantity >= 1),
     CONSTRAINT chk_unit_price_min   CHECK (unit_price > 0)

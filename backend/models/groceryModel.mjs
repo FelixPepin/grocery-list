@@ -1,5 +1,4 @@
 import pool from "../db.mjs";
-
 /**
  * Get all grocery items in the database
  * @returns {Promise<Array>} Array of all grocery items
@@ -53,7 +52,6 @@ export const updateItem = async (itemId, groceryItem) => {
     [name, quantity, unit_price, itemId],
   );
 };
-
 /**
  * Delete a grocery item
  * @param {number} itemId
@@ -61,7 +59,6 @@ export const updateItem = async (itemId, groceryItem) => {
 export const deleteItem = async (itemId) => {
   await pool.execute(`DELETE FROM grocery_items WHERE id = ?`, [itemId]);
 };
-
 /**
  * Delete all grocery items
  */

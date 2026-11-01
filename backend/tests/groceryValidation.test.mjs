@@ -6,11 +6,7 @@ import {
 
 const validItem = { name: "Apple", quantity: 3, unit_price: 1.5 };
 
-/**
- * Calls a middleware with a fake request and returns what was passed to next():
- * undefined when the data is valid, an Error otherwise.
- * No Express server is needed: the middleware is tested on its own (unit test).
- */
+/** Returns what the middleware passed to next(): undefined if valid, an Error otherwise. */
 function runMiddleware(middleware, req) {
   const next = vi.fn();
   middleware(req, {}, next);
@@ -34,7 +30,7 @@ describe("validateGroceryItem", () => {
     expect(req.body.name).toBe("Apple");
   });
 
-  // Each row breaks only ONE field of a valid item, so we know which rule failed
+  // Each row breaks a single field, so we know which rule failed
   it.each([
     ["name is missing", { name: undefined }, 400, "NAME_REQUIRED"],
     ["name is null", { name: null }, 400, "NAME_REQUIRED"],
@@ -54,13 +50,10 @@ describe("validateGroceryItem", () => {
     ["quantity is too high", { quantity: 10001 }, 422, "QUANTITY_TOO_HIGH"],
     ["unit_price is too high", { unit_price: 100001 }, 422, "UNIT_PRICE_TOO_HIGH"],
   ])("rejects the item when %s (%i %s)", (_label, override, status, code) => {
-    // Arrange
     const req = { body: { ...validItem, ...override } };
 
-    // Act
     const error = runMiddleware(validateGroceryItem, req);
 
-    // Assert
     expect(error).toBeInstanceOf(Error);
     expect(error.statusCode).toBe(status);
     expect(error.code).toBe(code);
@@ -73,7 +66,7 @@ describe("validateItemId", () => {
     expect(runMiddleware(validateItemId, { params: { id } })).toBeUndefined();
   });
 
-  // "" is an edge case: Number("") is 0, which must be rejected
+  // Number("") is 0, so "" must be rejected too
   it.each(["abc", "0", "-3", "2.5", ""])(
     "rejects the id '%s' with 400 ID_INVALID",
     (id) => {

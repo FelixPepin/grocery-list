@@ -4,12 +4,10 @@ import { devLog } from '../data/devLog'
 
 const { t, locale } = useI18n()
 
-// Steps not finished yet have minutes: null and are left out of the total
-const totalMinutes = devLog.reduce((sum, entry) => sum + (entry.minutes ?? 0), 0)
+const totalMinutes = devLog.reduce((sum, entry) => sum + entry.minutes, 0)
 
 /** 42 → "42 min", 88 → "1 h 28" */
 function formatDuration(minutes) {
-  if (minutes === null) return t('devLog.inProgress')
   const hours = Math.floor(minutes / 60)
   const rest = minutes % 60
   if (hours === 0) return `${rest} min`
@@ -22,7 +20,6 @@ function formatDuration(minutes) {
     <h2>{{ t('devLog.title') }}</h2>
     <p class="intro">{{ t('devLog.intro') }}</p>
 
-    <!-- Lets the table scroll sideways on a narrow screen instead of overflowing -->
     <div class="table-wrapper">
       <table>
         <thead>
@@ -36,9 +33,7 @@ function formatDuration(minutes) {
           <tr v-for="entry in devLog" :key="entry.step.en">
             <th scope="row">{{ entry.step[locale] }}</th>
             <td>{{ entry.details[locale] }}</td>
-            <td class="time" :class="{ pending: entry.minutes === null }">
-              {{ formatDuration(entry.minutes) }}
-            </td>
+            <td class="time">{{ formatDuration(entry.minutes) }}</td>
           </tr>
         </tbody>
         <tfoot>
@@ -109,11 +104,6 @@ tbody td {
 tbody td.time {
   font-weight: 500;
   color: var(--color-text);
-}
-
-tbody td.pending {
-  font-style: italic;
-  color: var(--color-text-muted);
 }
 
 tfoot th,

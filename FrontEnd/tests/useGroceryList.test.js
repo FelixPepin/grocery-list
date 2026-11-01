@@ -5,16 +5,14 @@ const { items, isLoading, errorCode, total, fetchItems, updateItem, deleteItem, 
   useGroceryList()
 const apple = { id: 1, name: 'Apple', quantity: 3, unit_price: 1.5 }
 
-/** Builds a fake fetch response, like the one the browser returns. */
 function fakeResponse(status, body) {
   return { ok: status >= 200 && status < 300, status, json: async () => body }
 }
 
 beforeEach(() => {
-  // The state is shared by the whole app: reset it between tests
+  // Reset the shared state between tests
   items.value = []
   errorCode.value = ''
-  // fetch is replaced by a fake: the tests never call the real API
   vi.stubGlobal('fetch', vi.fn())
 })
 
@@ -91,7 +89,6 @@ describe('useGroceryList - update, delete and total', () => {
   })
 
   it('removes the deleted item without reading the empty 204 body', async () => {
-    // Reading the body of a 204 would throw: json() must never be called
     const json = vi.fn()
     fetch.mockResolvedValue({ ok: true, status: 204, json })
 
@@ -120,7 +117,7 @@ describe('useGroceryList - update, delete and total', () => {
   })
 
   it('computes the total of the list', () => {
-    // 3 × 1.50 + 6 × 0.35 = 6.60 (toBeCloseTo ignores floating-point errors)
+    // 3 × 1.50 + 6 × 0.35 = 6.60
     expect(total.value).toBeCloseTo(6.6)
   })
 })

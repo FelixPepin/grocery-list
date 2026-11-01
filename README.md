@@ -228,7 +228,7 @@ Le frontend et l'API utilisent les mêmes règles et les mêmes codes d'erreur. 
 
 ## Temps consacré
 
-Environ **16 heures** au total, avec le détail ci-dessous.
+Environ **17 heures** au total, avec le détail ci-dessous.
 
 Le même tableau est aussi disponible **directement dans l'application**, sur la page **Journal de développement** (lien dans l'en-tête). Cette page ne fait pas partie de la liste d'épicerie elle-même, et c'est voulu : j'aime vraiment travailler avec **Vue Router**, et comme l'application n'avait besoin que d'une seule page, je ne voulais pas laisser le routage de côté. Ajouter une deuxième page était une façon simple de le montrer, avec une route chargée à la demande, un style pour le lien actif et des tests, sans toucher à la liste d'épicerie elle-même.
 
@@ -248,7 +248,8 @@ Le même tableau est aussi disponible **directement dans l'application**, sur la
 | Page du journal de développement | Vue Router, route chargée à la demande, ce tableau | 1 h 22 |
 | Documentation | README en anglais et en français | 29 min |
 | Vérification finale | Clone vide, en suivant ce README étape par étape | 47 min |
-| **Total** | | **16 h 02** |
+| Revue finale | Revue du code, commentaires simplifiés, renommages, ménage | 1 h 19 |
+| **Total** | | **17 h 21** |
 
 ---
 

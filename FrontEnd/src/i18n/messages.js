@@ -76,7 +76,6 @@ export const messages = {
       details: 'Details',
       time: 'Time',
       total: 'Total',
-      inProgress: 'In progress',
     },
   },
   fr: {
@@ -152,7 +151,6 @@ export const messages = {
       details: 'Détails',
       time: 'Temps',
       total: 'Total',
-      inProgress: 'En cours',
     },
   },
 }

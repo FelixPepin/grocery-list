@@ -15,7 +15,7 @@ onMounted(fetchItems)
 <template>
   <GroceryForm />
 
-  <!-- Order matters: loading first, then error, so a server error never shows "empty list" -->
+  <!-- Error before empty: a failed load is not an empty list -->
   <p v-if="isLoading" class="status">{{ t('list.loading') }}</p>
   <AlertMessage v-else-if="errorCode" :message="t(`errors.${errorCode}`)" />
   <p v-else-if="items.length === 0" class="status">{{ t('list.empty') }}</p>

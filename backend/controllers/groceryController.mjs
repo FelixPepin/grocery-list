@@ -8,9 +8,7 @@ import {
 } from "../models/groceryModel.mjs";
 import { httpError } from "../utils/httpError.mjs";
 
-/**
- * GET /grocery_list : Returns every item of the grocery list.
- */
+// GET /grocery_list
 export const getItems = async (req, res) => {
   const items = await getAllItems();
 
@@ -23,9 +21,7 @@ export const getItems = async (req, res) => {
   });
 };
 
-/**
- * POST /grocery_list : Creates an item.
- */
+// POST /grocery_list
 export const createItem = async (req, res) => {
   const { name, quantity, unit_price } = req.body;
 
@@ -46,9 +42,7 @@ export const createItem = async (req, res) => {
   });
 };
 
-/**
- * PUT /grocery_list/:id : Updates an item.
- */
+// PUT /grocery_list/:id
 export const updateItem = async (req, res) => {
   const { name, quantity, unit_price } = req.body;
   const itemId = Number(req.params.id);
@@ -72,9 +66,7 @@ export const updateItem = async (req, res) => {
   });
 };
 
-/**
- * DELETE /grocery_list/:id : Deletes an item.
- */
+// DELETE /grocery_list/:id
 export const deleteItem = async (req, res) => {
   const itemId = Number(req.params.id);
 
@@ -88,9 +80,7 @@ export const deleteItem = async (req, res) => {
   res.status(204).send();
 };
 
-/**
- * DELETE /grocery_list : Deletes all items.
- */
+// DELETE /grocery_list
 export const deleteAllItems = async (req, res) => {
   await deleteAllItemsModel();
 
