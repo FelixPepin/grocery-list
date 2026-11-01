@@ -13,6 +13,9 @@ export const messages = {
       quantity: 'Qty',
       unitPrice: 'Unit price',
       subtotal: 'Subtotal',
+      total: 'Total',
+      clear: 'Clear the list',
+      confirmClear: 'Delete every item?',
     },
     errors: {
       NETWORK_ERROR: 'Unable to reach the server. Is the backend running?',
@@ -39,6 +42,23 @@ export const messages = {
       submit: 'Add',
       submitting: 'Adding…',
       success: '{name} was added to your list.',
+      editTitle: 'Edit the item',
+      save: 'Save',
+      saving: 'Saving…',
+      cancel: 'Cancel',
+    },
+    item: {
+      edit: 'Edit',
+      delete: 'Delete',
+      confirmDelete: 'Delete {name}?',
+    },
+    common: {
+      yes: 'Yes',
+      no: 'No',
+      irreversible: 'This action cannot be undone.',
+    },
+    language: {
+      label: 'Language',
     },
   },
   fr: {
@@ -51,6 +71,9 @@ export const messages = {
       quantity: 'Qté',
       unitPrice: 'Prix unitaire',
       subtotal: 'Sous-total',
+      total: 'Total',
+      clear: 'Vider la liste',
+      confirmClear: 'Supprimer tous les articles?',
     },
     errors: {
       NETWORK_ERROR: 'Impossible de joindre le serveur. Le backend est-il démarré?',
@@ -77,6 +100,23 @@ export const messages = {
       submit: 'Ajouter',
       submitting: 'Ajout…',
       success: '{name} a été ajouté à votre liste.',
+      editTitle: "Modifier l'article",
+      save: 'Enregistrer',
+      saving: 'Enregistrement…',
+      cancel: 'Annuler',
+    },
+    item: {
+      edit: 'Modifier',
+      delete: 'Supprimer',
+      confirmDelete: 'Supprimer {name}?',
+    },
+    common: {
+      yes: 'Oui',
+      no: 'Non',
+      irreversible: 'Cette action est irréversible.',
+    },
+    language: {
+      label: 'Langue',
     },
   },
 }
