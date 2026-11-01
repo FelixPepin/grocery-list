@@ -41,6 +41,12 @@ Réalisée dans le cadre du test technique pour le stage chez OVA.
 
 Les ports **3000** (API), **3307** (MySQL) et **5173** (frontend) doivent être libres.
 
+**Avant de commencer (Windows)**
+- Après avoir installé un outil, **ouvrez un nouveau terminal** pour qu'il soit reconnu.
+- Si Docker Desktop demande la fonctionnalité « Virtual Machine Platform », choisissez **All-users installation** à l'installation, ou lancez `wsl --install` dans un PowerShell administrateur, puis redémarrez.
+- Si PowerShell affiche `l'exécution de scripts est désactivée sur ce système` en lançant `npm`, exécutez une fois `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`, ou utilisez `npm.cmd` au lieu de `npm`.
+- Raccourci facultatif avec winget : `winget install --id Git.Git -e`, `winget install --id OpenJS.NodeJS.LTS -e`, `winget install --id Docker.DockerDesktop -e`.
+
 ---
 
 ## Démarrage
@@ -222,7 +228,7 @@ Le frontend et l'API utilisent les mêmes règles et les mêmes codes d'erreur. 
 
 ## Temps consacré
 
-Environ **X heures** au total, avec le détail ci-dessous.
+Environ **16 heures** au total, avec le détail ci-dessous.
 
 Le même tableau est aussi disponible **directement dans l'application**, sur la page **Journal de développement** (lien dans l'en-tête). Cette page ne fait pas partie de la liste d'épicerie elle-même, et c'est voulu : j'aime vraiment travailler avec **Vue Router**, et comme l'application n'avait besoin que d'une seule page, je ne voulais pas laisser le routage de côté. Ajouter une deuxième page était une façon simple de le montrer, avec une route chargée à la demande, un style pour le lien actif et des tests, sans toucher à la liste d'épicerie elle-même.
 
@@ -236,13 +242,13 @@ Le même tableau est aussi disponible **directement dans l'application**, sur la
 | Tests du backend | Vitest + Supertest, modèle simulé | 1 h 07 |
 | Affichage de la liste | Vue 3 + Vite, composable, traductions FR/EN, états de chargement, d'erreur et de liste vide | 1 h 52 |
 | Formulaire d'ajout | Validation et messages sous chaque champ, valeurs maximales des deux côtés | 2 h 09 |
-| Modifier, supprimer, total et langue | Modification dans la carte, fenêtre de confirmation, total, vider la liste, choix de la langue | 1 h 57 |
+| Modifier, supprimer, total et langue | Modification dans la carte, fenêtre de confirmation, total, vider la liste, bouton FR/EN | 1 h 57 |
 | Intégration continue | GitHub Actions (tests, lint, build), branche `main` protégée | 18 min |
 | Nettoyage du code | Code inutile retiré, styles de boutons communs, traductions manquantes | 1 h 00 |
 | Page du journal de développement | Vue Router, route chargée à la demande, ce tableau | 1 h 22 |
 | Documentation | README en anglais et en français | 29 min |
-| Vérification finale | Clone vide, en suivant ce README étape par étape | X |
-| **Total** | | **X** |
+| Vérification finale | Clone vide, en suivant ce README étape par étape | 47 min |
+| **Total** | | **16 h 02** |
 
 ---
 

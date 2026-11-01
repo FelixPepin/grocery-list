@@ -114,6 +114,6 @@ export const devLog = [
       en: 'Fresh clone, following the README step by step',
       fr: 'Clone vide, en suivant le README étape par étape',
     },
-    minutes: null,
+    minutes: 47,
   },
 ]
