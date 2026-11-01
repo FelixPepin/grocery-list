@@ -1774,7 +1774,7 @@
       ]
     },
     {
-      "name": "⚠️ Destructive - run separately",
+      "name": "Destructive - run separately",
       "description": "Deletes EVERY item (including the sample data). Not part of the normal run: right-click this folder > Run folder. To get the sample data back: docker compose down -v && docker compose up -d",
       "item": [
         {

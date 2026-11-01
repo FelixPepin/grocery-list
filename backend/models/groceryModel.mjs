@@ -44,35 +44,27 @@ export const createItem = async (groceryItem) => {
  * Modify a grocery item.
  * @param {number} itemId
  * @param {Object} groceryItem The grocery item to modify.
- * @returns The rows that got affected by the UPDATE
  */
 export const updateItem = async (itemId, groceryItem) => {
   const { name, quantity, unit_price } = groceryItem;
 
-  const [result] = await pool.execute(
+  await pool.execute(
     `UPDATE grocery_items SET name = ?, quantity = ?, unit_price = ? WHERE id = ?`,
     [name, quantity, unit_price, itemId],
   );
-  return result.affectedRows;
 };
 
 /**
  * Delete a grocery item
  * @param {number} itemId
- * @returns The rows that got affected by the UPDATE
  */
 export const deleteItem = async (itemId) => {
-  const [result] = await pool.execute(
-    `DELETE FROM grocery_items WHERE id = ?`,
-    [itemId],
-  );
-  return result.affectedRows;
+  await pool.execute(`DELETE FROM grocery_items WHERE id = ?`, [itemId]);
 };
+
 /**
  * Delete all grocery items
- * @returns The rows that got affected by the delete
  */
 export const deleteAllItems = async () => {
-  const [result] = await pool.execute("DELETE FROM grocery_items");
-  return result.affectedRows;
+  await pool.execute(`DELETE FROM grocery_items`);
 };

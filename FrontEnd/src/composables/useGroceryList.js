@@ -8,17 +8,9 @@ const isLoading = ref(false)
 // Stores the error CODE (not a message) so the component can translate it
 const errorCode = ref('')
 
-// Recalculated automatically every time an item is added, updated or removed
 const total = computed(() =>
   items.value.reduce((sum, item) => sum + item.quantity * item.unit_price, 0),
 )
-
-/**
- * Removes an item from the shared items.
- */
-function removeFromItems(id) {
-  items.value = items.value.filter((item) => item.id !== id)
-}
 
 export function useGroceryList() {
   /**
@@ -108,7 +100,7 @@ export function useGroceryList() {
         return { success: false, code: body.code || 'INTERNAL_ERROR' }
       }
 
-      removeFromItems(id)
+      items.value = items.value.filter((item) => item.id !== id)
       return { success: true }
     } catch {
       return { success: false, code: 'NETWORK_ERROR' }

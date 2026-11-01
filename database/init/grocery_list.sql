@@ -13,7 +13,7 @@ SET NAMES utf8mb4;
 
 CREATE TABLE IF NOT EXISTS grocery_items (
     id          INT           NOT NULL AUTO_INCREMENT,
-    name        VARCHAR(100)  NOT NULL,
+    name        VARCHAR(50)   NOT NULL,
     quantity    INT           NOT NULL,
     unit_price  DECIMAL(10,2) NOT NULL,
     created_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS grocery_items (
 
     PRIMARY KEY (id),
 
-    -- Last line of defense: the API validates first, the database guarantees it
+    -- Same rules as the API validation
     CONSTRAINT chk_name_not_empty   CHECK (CHAR_LENGTH(TRIM(name)) > 0),
     CONSTRAINT chk_quantity_min     CHECK (quantity >= 1),
     CONSTRAINT chk_unit_price_min   CHECK (unit_price > 0)

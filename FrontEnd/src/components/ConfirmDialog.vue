@@ -38,7 +38,7 @@ watch(
   <!-- .prevent: the parent decides when to close (Esc only asks for it) -->
   <dialog ref="dialog" class="confirm-dialog" @cancel.prevent="emit('cancel')">
     <p class="message">{{ message }}</p>
-    <p v-if="warning" class="warning">⚠️ {{ warning }}</p>
+    <p v-if="warning" class="warning">{{ warning }}</p>
     <div class="buttons">
       <!-- autofocus on "No": pressing Enter by accident never deletes -->
       <button autofocus :disabled="busy" @click="emit('cancel')">
@@ -82,13 +82,8 @@ watch(
   gap: var(--space-sm);
 }
 
-button {
-  padding: var(--space-sm) var(--space-lg);
-  font: inherit;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  cursor: pointer;
+button:hover:not(:disabled) {
+  background: var(--color-background);
 }
 
 button.danger {
@@ -97,8 +92,8 @@ button.danger {
   border-color: var(--color-error);
 }
 
-button:disabled {
-  opacity: 0.6;
-  cursor: wait;
+button.danger:hover:not(:disabled) {
+  background: var(--color-error-hover);
+  border-color: var(--color-error-hover);
 }
 </style>

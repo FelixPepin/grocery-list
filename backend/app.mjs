@@ -5,7 +5,6 @@ import { get404, getErrors } from "./controllers/errorController.mjs";
 
 const app = express();
 
-// Parse JSON request bodies
 app.use(express.json());
 
 // CORS: only the frontend is allowed to call the API
@@ -22,7 +21,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Log every request in the terminal
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();

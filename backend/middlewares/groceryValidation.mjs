@@ -7,9 +7,6 @@ const UNIT_PRICE_MAX = 100000;
 /**
  * Validates the body of POST and PUT /grocery_list requests.
  * On success, the name is trimmed before reaching the controller.
- * @param {*} req
- * @param {*} res
- * @param {*} next
  */
 export function validateGroceryItem(req, res, next) {
   const { name, quantity, unit_price } = req.body;
@@ -92,9 +89,6 @@ export function validateGroceryItem(req, res, next) {
 /**
  * Validates the :id parameter of PUT and DELETE /grocery_list/:id requests.
  * URL parameters are always strings, so the id is converted before being checked.
- * @param {*} req
- * @param {*} res
- * @param {*} next
  */
 export function validateItemId(req, res, next) {
   const id = Number(req.params.id);

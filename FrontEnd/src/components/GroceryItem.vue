@@ -52,7 +52,7 @@ async function confirmDelete() {
 
 <template>
   <li class="grocery-item">
-    <GroceryForm v-if="isEditing" :item="item" class="edit-form" @done="isEditing = false" />
+    <GroceryForm v-if="isEditing" :item="item" class="full-width" @done="isEditing = false" />
     <template v-else>
       <div class="content">
         <h2 class="name">{{ item.name }}</h2>
@@ -90,7 +90,7 @@ async function confirmDelete() {
         @confirm="confirmDelete"
         @cancel="isConfirmingDelete = false"
       />
-      <AlertMessage v-if="errorCode" class="error" :message="t(`errors.${errorCode}`)" />
+      <AlertMessage v-if="errorCode" class="full-width" :message="t(`errors.${errorCode}`)" />
     </template>
   </li>
 </template>
@@ -154,12 +154,7 @@ async function confirmDelete() {
 
 button {
   padding: var(--space-xs) var(--space-md);
-  font: inherit;
   font-size: 0.9rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  cursor: pointer;
 }
 
 button:hover:not(:disabled) {
@@ -176,18 +171,8 @@ button.danger:hover:not(:disabled) {
   background: var(--color-error);
 }
 
-button:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
-/* The error takes the full width of the card, under its content */
-.error {
-  flex-basis: 100%;
-}
-
-/* The edit form takes the full width of the card */
-.edit-form {
+/* The edit form and the error take the full width of the card */
+.full-width {
   flex-basis: 100%;
 }
 </style>
