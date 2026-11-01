@@ -181,11 +181,7 @@ onMounted(() => {
           :aria-describedby="fieldErrors.unit_price ? fieldId('unit-price-error') : undefined"
           @blur="touched.unit_price = true"
         />
-        <small
-          v-if="fieldErrors.unit_price"
-          :id="fieldId('unit-price-error')"
-          class="field-error"
-        >
+        <small v-if="fieldErrors.unit_price" :id="fieldId('unit-price-error')" class="field-error">
           {{ fieldErrors.unit_price }}
         </small>
       </div>

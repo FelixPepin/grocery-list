@@ -64,6 +64,20 @@ export const messages = {
     language: {
       label: 'Language',
     },
+    nav: {
+      label: 'Main navigation',
+      list: 'Grocery list',
+      devLog: 'Development log',
+    },
+    devLog: {
+      title: 'Development log',
+      intro: 'Time spent on each step of this technical test.',
+      step: 'Step',
+      details: 'Details',
+      time: 'Time',
+      total: 'Total',
+      inProgress: 'In progress',
+    },
   },
   fr: {
     app: {
@@ -125,6 +139,20 @@ export const messages = {
     },
     language: {
       label: 'Langue',
+    },
+    nav: {
+      label: 'Navigation principale',
+      list: "Liste d'épicerie",
+      devLog: 'Journal de développement',
+    },
+    devLog: {
+      title: 'Journal de développement',
+      intro: 'Temps consacré à chaque étape de ce test technique.',
+      step: 'Étape',
+      details: 'Détails',
+      time: 'Temps',
+      total: 'Total',
+      inProgress: 'En cours',
     },
   },
 }
