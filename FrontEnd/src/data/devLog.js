@@ -106,7 +106,7 @@ export const devLog = [
       en: 'README in English and French',
       fr: 'README en anglais et en français',
     },
-    minutes: null,
+    minutes: 29,
   },
   {
     step: { en: 'Final check', fr: 'Vérification finale' },
