@@ -228,7 +228,7 @@ Le frontend et l'API utilisent les mêmes règles et les mêmes codes d'erreur. 
 
 ## Temps consacré
 
-Environ **17E heures** au total, avec le détail ci-dessous.
+Environ **17 heures** au total, avec le détail ci-dessous.
 
 Le même tableau est aussi disponible **directement dans l'application**, sur la page **Journal de développement** (lien dans l'en-tête). Cette page ne fait pas partie de la liste d'épicerie elle-même, et c'est voulu : j'aime vraiment travailler avec **Vue Router**, et comme l'application n'avait besoin que d'une seule page, je ne voulais pas laisser le routage de côté. Ajouter une deuxième page était une façon simple de le montrer, avec une route chargée à la demande, un style pour le lien actif et des tests, sans toucher à la liste d'épicerie elle-même.
 
