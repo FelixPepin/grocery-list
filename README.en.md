@@ -41,6 +41,12 @@ Built for the OVA full-stack internship technical test.
 
 The ports **3000** (API), **3307** (MySQL) and **5173** (frontend) must be free.
 
+**Before you start (Windows)**
+- After installing a tool, **open a new terminal** so it's recognized.
+- If Docker Desktop asks for the "Virtual Machine Platform" feature, choose **All-users installation** in the installer, or run `wsl --install` in an administrator PowerShell, then restart.
+- If PowerShell shows `running scripts is disabled on this system` when running `npm`, run `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` once, or use `npm.cmd` instead of `npm`.
+- Optional shortcut with winget: `winget install --id Git.Git -e`, `winget install --id OpenJS.NodeJS.LTS -e`, `winget install --id Docker.DockerDesktop -e`.
+
 ---
 
 ## Getting started
@@ -222,7 +228,7 @@ The frontend and the API use the same rules and the same error codes, so the mes
 
 ## Time spent
 
-About **X hours** in total, detailed below.
+About **16 hours** in total, detailed below.
 
 The same breakdown is also available **directly in the app**, on the **Development log** page (link in the header). This page isn't part of the grocery list itself, and that's intentional: I really enjoy working with **Vue Router**, and since the app only needed one page, I didn't want to leave routing out of the project. Adding a second page was a simple way to show it, with a lazy-loaded route, an active link style and tests, while keeping the grocery list itself untouched.
 
@@ -241,8 +247,8 @@ The same breakdown is also available **directly in the app**, on the **Developme
 | Cleanup | Unused code removed, shared button styles, missing translations | 1 h 00 |
 | Development log page | Vue Router, lazy-loaded route, this table | 1 h 22 |
 | Documentation | README in English and French | 29 min |
-| Final check | Fresh clone, following this README step by step | X |
-| **Total** | | **X** |
+| Final check | Fresh clone, following this README step by step | 47 min |
+| **Total** | | **16 h 02** |
 
 ---
 
