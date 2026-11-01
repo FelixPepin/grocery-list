@@ -48,12 +48,16 @@ const errors = computed(() => validateItem(form))
 
 const MAX_BY_FIELD = { name: NAME_MAX_LENGTH, quantity: QUANTITY_MAX, unit_price: UNIT_PRICE_MAX }
 
-/** Shows a field's error only once the user left the field or tried to submit. */
-function fieldError(field) {
-  if (!touched[field] && !submitted.value) return ''
-  const code = errors.value[field]
-  return code ? t(`errors.${code}`, { max: MAX_BY_FIELD[field] }) : ''
-}
+/** A field's error is shown only once the user left the field or tried to submit. */
+const fieldErrors = computed(() => {
+  const messages = {}
+  for (const field of FIELDS) {
+    const code = errors.value[field]
+    const isVisible = touched[field] || submitted.value
+    messages[field] = isVisible && code ? t(`errors.${code}`, { max: MAX_BY_FIELD[field] }) : ''
+  }
+  return messages
+})
 
 function resetForm() {
   Object.assign(form, initialForm())
@@ -132,13 +136,13 @@ onMounted(() => {
           v-model="form.name"
           type="text"
           autocomplete="off"
-          :class="{ invalid: fieldError('name') }"
-          :aria-invalid="fieldError('name') ? 'true' : undefined"
-          :aria-describedby="fieldError('name') ? fieldId('name-error') : undefined"
+          :class="{ invalid: fieldErrors.name }"
+          :aria-invalid="fieldErrors.name ? 'true' : undefined"
+          :aria-describedby="fieldErrors.name ? fieldId('name-error') : undefined"
           @blur="touched.name = true"
         />
-        <small v-if="fieldError('name')" :id="fieldId('name-error')" class="field-error">
-          {{ fieldError('name') }}
+        <small v-if="fieldErrors.name" :id="fieldId('name-error')" class="field-error">
+          {{ fieldErrors.name }}
         </small>
       </div>
 
@@ -152,13 +156,13 @@ onMounted(() => {
           min="1"
           step="1"
           inputmode="numeric"
-          :class="{ invalid: fieldError('quantity') }"
-          :aria-invalid="fieldError('quantity') ? 'true' : undefined"
-          :aria-describedby="fieldError('quantity') ? fieldId('quantity-error') : undefined"
+          :class="{ invalid: fieldErrors.quantity }"
+          :aria-invalid="fieldErrors.quantity ? 'true' : undefined"
+          :aria-describedby="fieldErrors.quantity ? fieldId('quantity-error') : undefined"
           @blur="touched.quantity = true"
         />
-        <small v-if="fieldError('quantity')" :id="fieldId('quantity-error')" class="field-error">
-          {{ fieldError('quantity') }}
+        <small v-if="fieldErrors.quantity" :id="fieldId('quantity-error')" class="field-error">
+          {{ fieldErrors.quantity }}
         </small>
       </div>
 
@@ -172,17 +176,17 @@ onMounted(() => {
           min="0.01"
           step="0.01"
           inputmode="decimal"
-          :class="{ invalid: fieldError('unit_price') }"
-          :aria-invalid="fieldError('unit_price') ? 'true' : undefined"
-          :aria-describedby="fieldError('unit_price') ? fieldId('unit-price-error') : undefined"
+          :class="{ invalid: fieldErrors.unit_price }"
+          :aria-invalid="fieldErrors.unit_price ? 'true' : undefined"
+          :aria-describedby="fieldErrors.unit_price ? fieldId('unit-price-error') : undefined"
           @blur="touched.unit_price = true"
         />
         <small
-          v-if="fieldError('unit_price')"
+          v-if="fieldErrors.unit_price"
           :id="fieldId('unit-price-error')"
           class="field-error"
         >
-          {{ fieldError('unit_price') }}
+          {{ fieldErrors.unit_price }}
         </small>
       </div>
     </div>
@@ -276,14 +280,10 @@ input.invalid {
 }
 
 button {
-  padding: var(--space-sm) var(--space-lg);
-  font: inherit;
   font-weight: 600;
   color: white;
   background: var(--color-primary);
   border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
 }
 
 button:hover:not(:disabled) {
@@ -298,11 +298,6 @@ button.secondary {
 
 button.secondary:hover:not(:disabled) {
   background: var(--color-background);
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: wait;
 }
 
 /* One field per line on small screens */

@@ -8,7 +8,7 @@
     "test": "vitest run",
     "build": "vite build",
     "preview": "vite preview",
-    "test:unit": "vitest",
+    "test:watch": "vitest",
     "lint": "run-s \"lint:*\"",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",

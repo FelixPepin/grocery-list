@@ -10,8 +10,6 @@ const errorTypes = {
 
 /**
  * Middleware that captures undefined routes.
- * @param {*} req
- * @param {*} res
  */
 export const get404 = (req, res) => {
   res.status(404).json({
@@ -42,7 +40,7 @@ export const getErrors = (err, req, res, next) => {
     code = "INVALID_JSON";
   }
 
-  // Database CHECK constraint: last line of defense after the API validation
+  // Database CHECK constraint failed (the API validation should catch it first)
   if (err.code === "ER_CHECK_CONSTRAINT_VIOLATED") {
     statusCode = 422;
     message = "The data does not respect the database constraints";

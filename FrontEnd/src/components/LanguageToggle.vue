@@ -37,13 +37,12 @@ const LANGUAGES = [
 
 button {
   padding: var(--space-xs) var(--space-md);
-  font: inherit;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-text-muted);
-  background: var(--color-surface);
   border: none;
-  cursor: pointer;
+  /* The group's border is already rounded */
+  border-radius: 0;
 }
 
 button:hover:not(.active) {

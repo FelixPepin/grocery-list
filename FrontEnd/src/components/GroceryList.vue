@@ -105,13 +105,9 @@ async function confirmClear() {
 
 button.danger {
   padding: var(--space-xs) var(--space-md);
-  font: inherit;
   font-size: 0.9rem;
   color: var(--color-error);
-  background: var(--color-surface);
-  border: 1px solid var(--color-error);
-  border-radius: var(--radius);
-  cursor: pointer;
+  border-color: var(--color-error);
 }
 
 button.danger:hover {

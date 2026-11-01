@@ -10,8 +10,6 @@ import { httpError } from "../utils/httpError.mjs";
 
 /**
  * GET /grocery_list : Returns every item of the grocery list.
- * @param {*} req
- * @param {*} res
  */
 export const getItems = async (req, res) => {
   const items = await getAllItems();
@@ -27,8 +25,6 @@ export const getItems = async (req, res) => {
 
 /**
  * POST /grocery_list : Creates an item.
- * @param {*} req
- * @param {*} res
  */
 export const createItem = async (req, res) => {
   const { name, quantity, unit_price } = req.body;
@@ -52,8 +48,6 @@ export const createItem = async (req, res) => {
 
 /**
  * PUT /grocery_list/:id : Updates an item.
- * @param {*} req
- * @param {*} res
  */
 export const updateItem = async (req, res) => {
   const { name, quantity, unit_price } = req.body;
@@ -80,8 +74,6 @@ export const updateItem = async (req, res) => {
 
 /**
  * DELETE /grocery_list/:id : Deletes an item.
- * @param {*} req
- * @param {*} res
  */
 export const deleteItem = async (req, res) => {
   const itemId = Number(req.params.id);
@@ -98,8 +90,6 @@ export const deleteItem = async (req, res) => {
 
 /**
  * DELETE /grocery_list : Deletes all items.
- * @param {*} req
- * @param {*} res
  */
 export const deleteAllItems = async (req, res) => {
   await deleteAllItemsModel();

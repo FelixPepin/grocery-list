@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url'
-import { mergeConfig, defineConfig, configDefaults } from 'vitest/config'
+import { mergeConfig, defineConfig } from 'vitest/config'
 import viteConfig from './vite.config.js'
 
 export default mergeConfig(
@@ -11,7 +11,6 @@ export default mergeConfig(
       // --localstorage-file): turn it off so tests use jsdom's
       execArgv: ['--no-experimental-webstorage'],
       include: ['tests/**/*.test.js'],
-      exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
       setupFiles: ['tests/setup.js'],
     },
